@@ -42,7 +42,7 @@ func Test_getSession(t *testing.T) {
 	}
 	defer session.Close()
 
-	// getSession when sessionId does not exist
+	t.Logf("Test SessionId does not exist.")
 	sessionId := &SessionId{Id: bson.NewObjectId(), Username: "Nemo"}
 	if result, err := getSession(session, sessionId); err != mgo.ErrNotFound {
 		t.Error(err)
@@ -50,7 +50,7 @@ func Test_getSession(t *testing.T) {
 		t.Error("result is not nil")
 	}
 
-	// getSession when sessionId exists
+	t.Logf("Test SessionId exists.")
 	sessionId, err = startSession(session, "Nemo")
 	if err != nil {
 		t.Fatal(err)
@@ -69,12 +69,12 @@ func Test_endSession(t *testing.T) {
 		t.Fatal(err)
 	}
 	defer session.Close()
-	// sessionId does not exist
+	t.Logf("Test SessionId does not exist.")
 	sessionId := &SessionId{Id: bson.NewObjectId(), Username: "Nemo"}
 	if err := endSession(session, sessionId); err != mgo.ErrNotFound {
 		t.Error(err)
 	}
-	// sessionId exists
+	t.Logf("Test SessionId exists.")
 	sessionId, err = startSession(session, "john")
 	if err != nil || sessionId == nil {
 		t.Fatal(err)
