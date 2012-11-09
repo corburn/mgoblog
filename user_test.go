@@ -84,3 +84,35 @@ func Test_endSession(t *testing.T) {
 		t.Error(err)
 	}
 }
+
+func Test_newUser(t *testing.T) {
+	c, session, err := connect(users)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	t.Logf("Test without email")
+	foo, err := newUser(session, "Foo", "password", "")
+	if err != nil {
+		t.Error(err)
+	}
+	t.Logf("Test with email")
+	nemo1, err := newUser(session, "Nemo", "password", "nemo@example.com")
+	if err != nil {
+		t.Error(err)
+	}
+	t.Logf("Test duplicate user")
+	nemo2, err := newUser(session, "Nemo", "password", "nemo@example.com")
+	if !mgo.IsDup(err) {
+		t.Error(err)
+	}
+	if err = c.Remove(foo); err != nil {
+		t.Error(err)
+	}
+	if err = c.Remove(nemo1); err != nil {
+		t.Error(err)
+	}
+	if err = c.Remove(nemo2); err != mgo.ErrNotFound {
+		t.Error(err)
+	}
+}

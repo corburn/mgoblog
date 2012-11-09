@@ -1,6 +1,7 @@
 package main
 
 import (
+	"code.google.com/p/go.crypto/bcrypt"
 	"labix.org/v2/mgo"
 	"labix.org/v2/mgo/bson"
 )
@@ -33,4 +34,22 @@ func endSession(session *mgo.Session, sessionId *SessionId) error {
 	c := session.DB(database).C(sessions)
 	err := c.Remove(sessionId)
 	return err
+}
+
+type User struct {
+	Id string `bson:"_id"`
+	Password []byte
+	Email string `bson:",omitempty"`
+}
+
+// newUser creates a new user in the database
+func newUser(session *mgo.Session, username, password, email string) (*User, error) {
+	pHash, err := bcrypt.GenerateFromPassword([]byte(password), 10)
+	if err != nil {
+		return nil, err
+	}
+	user := &User{Id: username, Password: pHash, Email: email}
+	c := session.DB(database).C(users)
+	err = c.Insert(user)
+	return user, err
 }
