@@ -27,7 +27,7 @@ func Test_startSession(t *testing.T) {
 	if err != nil {
 		t.Error(err)
 	}
-	if n, err := c.Count(); n != count + 1 {
+	if n, err := c.Count(); n != count+1 {
 		t.Error("It does not look like a session was started.")
 	} else if err != nil {
 		t.Error(err)

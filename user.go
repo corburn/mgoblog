@@ -12,7 +12,7 @@ import (
 )
 
 type SessionId struct {
-	Id bson.ObjectId "_id,omitempty"
+	Id       bson.ObjectId "_id,omitempty"
 	Username string
 }
 
@@ -42,9 +42,9 @@ func endSession(session *mgo.Session, sessionId *SessionId) error {
 }
 
 type User struct {
-	Id string `bson:"_id"`
+	Id       string `bson:"_id"`
 	Password []byte
-	Email string `bson:",omitempty"`
+	Email    string `bson:",omitempty"`
 }
 
 // newUser creates a new user in the database
@@ -60,6 +60,7 @@ func newUser(session *mgo.Session, username, password, email string) (*User, err
 }
 
 const key = "thisisnotsecret"
+
 func hashStr(s string) (string, error) {
 	h := hmac.New(md5.New, []byte(key))
 	_, err := io.WriteString(h, s)

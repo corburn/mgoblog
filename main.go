@@ -5,10 +5,10 @@ import (
 )
 
 const (
-	url = "mongodb://localhost"
+	url      = "mongodb://localhost"
 	database = "blog"
 	sessions = "sessions"
-	users = "users"
+	users    = "users"
 )
 
 var session *mgo.Session
