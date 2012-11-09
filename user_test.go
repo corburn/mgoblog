@@ -21,17 +21,20 @@ func Test_startSession(t *testing.T) {
 	defer session.Close()
 	count, err := c.Count()
 	if err != nil {
-		t.Fatal(err)
+		t.Error(err)
 	}
 	sessionId, err := startSession(session, "Nemo")
 	if err != nil {
 		t.Error(err)
 	}
-	defer c.Remove(sessionId)
 	if n, err := c.Count(); n != count + 1 {
 		t.Error("It does not look like a session was started.")
 	} else if err != nil {
-		t.Fatal(err)
+		t.Error(err)
+	}
+
+	if err = c.Remove(sessionId); err != nil {
+		t.Error(err)
 	}
 }
 
@@ -55,11 +58,14 @@ func Test_getSession(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	defer c.Remove(sessionId)
 	if result, err := getSession(session, sessionId); err != nil {
 		t.Error(err)
 	} else if result == nil {
 		t.Error("result is nil")
+	}
+
+	if err = c.Remove(sessionId); err != nil {
+		t.Error(err)
 	}
 }
 
@@ -106,6 +112,7 @@ func Test_newUser(t *testing.T) {
 	if !mgo.IsDup(err) {
 		t.Error(err)
 	}
+
 	if err = c.Remove(foo); err != nil {
 		t.Error(err)
 	}
