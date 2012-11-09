@@ -4,21 +4,26 @@ import (
 	"testing"
 
 	"labix.org/v2/mgo"
+	"labix.org/v2/mgo/bson"
 )
 
+func connect(collection string) (c *mgo.Collection, session *mgo.Session, err error) {
+	session, err = mgo.Dial(url)
+	c = session.DB(database).C(collection)
+	return
+}
+
 func Test_startSession(t *testing.T) {
-	session, err := mgo.Dial(url)
-	defer session.Close()
+	c, session, err := connect("sessions")
 	if err != nil {
 		t.Fatal(err)
 	}
-	c := session.DB(database).C("sessions")
+	defer session.Close()
 	count, err := c.Count()
 	if err != nil {
-		// TODO: may not be fatal
 		t.Fatal(err)
 	}
-	sessionId, err := startSession(session, "john")
+	sessionId, err := startSession(session, "Nemo")
 	if err != nil {
 		t.Error(err)
 	}
@@ -26,7 +31,34 @@ func Test_startSession(t *testing.T) {
 	if n, err := c.Count(); n != count + 1 {
 		t.Error("It does not look like a session was started.")
 	} else if err != nil {
-		// TODO: may not be fatal
 		t.Fatal(err)
+	}
+}
+
+func Test_getSession(t *testing.T) {
+	c, session, err := connect("sessions")
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer session.Close()
+
+	// getSession when sessionId does not exist
+	sessionId := &SessionId{Id: bson.NewObjectId(), Username: "Nemo"}
+	if result, err := getSession(session, sessionId); err != mgo.ErrNotFound {
+		t.Error(err)
+	} else if result != nil {
+		t.Error("result is not nil")
+	}
+
+	// getSession when sessionId exists
+	sessionId, err = startSession(session, "Nemo")
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer c.Remove(sessionId)
+	if result, err := getSession(session, sessionId); err != nil {
+		t.Error(err)
+	} else if result == nil {
+		t.Error("result is nil")
 	}
 }

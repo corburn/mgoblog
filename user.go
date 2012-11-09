@@ -19,3 +19,11 @@ func startSession(session *mgo.Session, username string) (*SessionId, error) {
 	}
 	return sessionId, nil
 }
+
+// getSession returns the requested SessionId if it exists
+// err == mgo.ErrNotFound if the SessionId does not exist
+func getSession(session *mgo.Session, sessionId *SessionId) (result bson.M, err error) {
+	c := session.DB(database).C("sessions")
+	err = c.Find(sessionId).One(&result)
+	return
+}
