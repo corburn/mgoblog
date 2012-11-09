@@ -14,7 +14,7 @@ func connect(collection string) (c *mgo.Collection, session *mgo.Session, err er
 }
 
 func Test_startSession(t *testing.T) {
-	c, session, err := connect("sessions")
+	c, session, err := connect(sessions)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -36,7 +36,7 @@ func Test_startSession(t *testing.T) {
 }
 
 func Test_getSession(t *testing.T) {
-	c, session, err := connect("sessions")
+	c, session, err := connect(sessions)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -64,11 +64,11 @@ func Test_getSession(t *testing.T) {
 }
 
 func Test_endSession(t *testing.T) {
-	_, session, err := connect("sessions")
-	defer session.Close()
+	_, session, err := connect(sessions)
 	if err != nil {
 		t.Fatal(err)
 	}
+	defer session.Close()
 	// sessionId does not exist
 	sessionId := &SessionId{Id: bson.NewObjectId(), Username: "Nemo"}
 	if err := endSession(session, sessionId); err != mgo.ErrNotFound {
