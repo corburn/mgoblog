@@ -1,6 +1,11 @@
 package main
 
 import (
+	"crypto/hmac"
+	"crypto/md5"
+	"encoding/hex"
+	"io"
+
 	"code.google.com/p/go.crypto/bcrypt"
 	"labix.org/v2/mgo"
 	"labix.org/v2/mgo/bson"
@@ -52,4 +57,14 @@ func newUser(session *mgo.Session, username, password, email string) (*User, err
 	c := session.DB(database).C(users)
 	err = c.Insert(user)
 	return user, err
+}
+
+const key = "thisisnotsecret"
+func hashStr(s string) (string, error) {
+	h := hmac.New(md5.New, []byte(key))
+	_, err := io.WriteString(h, s)
+	if err != nil {
+		return "", err
+	}
+	return hex.EncodeToString(h.Sum(nil)), nil
 }

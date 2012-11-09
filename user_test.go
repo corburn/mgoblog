@@ -123,3 +123,9 @@ func Test_newUser(t *testing.T) {
 		t.Error(err)
 	}
 }
+
+func Test_hashStr(t *testing.T) {
+	if s, err := hashStr("test"); s != "1e2379853564a6fd9ff69b0a99cd82d4" || err != nil {
+		t.Error("Failed to return a md5 hmac", err)
+	}
+}
