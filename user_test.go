@@ -62,3 +62,25 @@ func Test_getSession(t *testing.T) {
 		t.Error("result is nil")
 	}
 }
+
+func Test_endSession(t *testing.T) {
+	_, session, err := connect("sessions")
+	defer session.Close()
+	if err != nil {
+		t.Fatal(err)
+	}
+	// sessionId does not exist
+	sessionId := &SessionId{Id: bson.NewObjectId(), Username: "Nemo"}
+	if err := endSession(session, sessionId); err != mgo.ErrNotFound {
+		t.Error(err)
+	}
+	// sessionId exists
+	sessionId, err = startSession(session, "john")
+	if err != nil || sessionId == nil {
+		t.Fatal(err)
+	}
+	err = endSession(session, sessionId)
+	if err != nil {
+		t.Error(err)
+	}
+}
