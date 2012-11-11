@@ -2,8 +2,9 @@ package main
 
 import (
 	"fmt"
-	"net/http"
 	"html/template"
+	"log"
+	"net/http"
 
 	"labix.org/v2/mgo"
 )
@@ -18,8 +19,10 @@ const (
 )
 
 var (
-	session *mgo.Session
-	templates = template.Must(template.ParseFiles(tmplDir+"signup.html"))
+	trace = log.New(os.Stdout, "trace:", log.Lshortfile)
+
+	session   *mgo.Session
+	templates = template.Must(template.ParseFiles(tmplDir + "signup.html"))
 )
 
 func renderTemplate(w http.ResponseWriter, tmpl string, u *User) {
@@ -30,6 +33,8 @@ func renderTemplate(w http.ResponseWriter, tmpl string, u *User) {
 
 func root(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintf(w, "This is a place holder for the blog")
+
+	trace.Println(r, "\n")
 }
 
 func signup(w http.ResponseWriter, r *http.Request) {
@@ -38,12 +43,14 @@ func signup(w http.ResponseWriter, r *http.Request) {
 	email := r.FormValue("email")
 	user := &User{Id: username, Password: []byte(password), Email: email}
 	renderTemplate(w, "signup.html", user)
+
+	trace.Println(r, "\n")
 }
 
 func main() {
 	session, err := mgo.Dial(url)
 	if err != nil {
-		panic(err)
+		log.Fatalln(err)
 	}
 	defer session.Close()
 
