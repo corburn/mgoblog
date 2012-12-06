@@ -23,7 +23,7 @@ var (
 	trace = log.New(os.Stdout, "trace:", log.Lshortfile)
 
 	session   *mgo.Session
-	templates = template.Must(template.ParseFiles(tmplDir + "signup.html", tmplDir + "login.html"))
+	templates = template.Must(template.ParseFiles(tmplDir+"signup.html", tmplDir+"login.html"))
 )
 
 func renderTemplate(w http.ResponseWriter, tmpl string, u *User) {
@@ -39,19 +39,19 @@ func root(w http.ResponseWriter, r *http.Request) {
 }
 
 func signup(w http.ResponseWriter, r *http.Request) {
-	username := r.FormValue("username")
-	password := r.FormValue("password")
-	email := r.FormValue("email")
-	user := &User{Id: username, Password: []byte(password), Email: email}
+	var user = new(User)
+	user.Id = r.FormValue("username")
+	user.Password = []byte(r.FormValue("password"))
+	user.Email = r.FormValue("email")
 	renderTemplate(w, "signup.html", user)
 
 	trace.Println(r, "\n")
 }
 
 func login(w http.ResponseWriter, r *http.Request) {
-	username := r.FormValue("username")
-	password := r.FormValue("password")
-	user := &User{Id: username, Password: []byte(password)}
+	var user = new(User)
+	user.Id = r.FormValue("username")
+	user.Password = []byte(r.FormValue("password"))
 	renderTemplate(w, "login.html", user)
 
 	trace.Println(r, "\n")
